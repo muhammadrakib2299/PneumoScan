@@ -123,22 +123,94 @@ CONFIDENCE_THRESHOLDS = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 # Set to True when running in Google Colab
 USE_COLAB = False
 
-# Google Drive mount path (update if different)
-COLAB_DRIVE_DIR = "/content/drive/MyDrive/PneumoScan"
-COLAB_CHECKPOINT_DIR = os.path.join(COLAB_DRIVE_DIR, "checkpoints")
+# Google Drive — dataset location
+# Your chest_xray folder on Drive (shared link: https://drive.google.com/drive/folders/1nl6cMdZPZ0O3JtDqEeBbh96pA6GfsMNu)
+COLAB_DATA_DIR = "/content/drive/MyDrive/chest_xray"
+
+# Project directory on Colab (cloned from GitHub)
+COLAB_PROJECT_DIR = "/content/PneumoScan"
+COLAB_CHECKPOINT_DIR = "/content/drive/MyDrive/PneumoScan_checkpoints"
 
 
 def setup_colab():
-    """Call this at the top of Colab notebooks to mount Drive and set paths."""
-    global BASE_DIR, USE_COLAB
+    """
+    Call this at the top of Colab notebooks to:
+    1. Mount Google Drive
+    2. Clone/update the repo from GitHub
+    3. Reconfigure all paths to use Drive dataset + Colab project
+    """
+    global BASE_DIR, DATA_DIR, RAW_DATA_DIR, TRAIN_DIR, VAL_DIR, TEST_DIR
+    global SAMPLE_DIR, MODELS_DIR, OUTPUTS_DIR, FIGURES_DIR, REPORTS_DIR, TFLITE_DIR
+    global EDA_FIGURES_DIR, TRAINING_CURVES_DIR, CONFUSION_MATRICES_DIR
+    global ROC_CURVES_DIR, PR_CURVES_DIR, GRADCAM_DIR, LIME_DIR, COMPARISON_DIR
+    global MODEL_SAVE_PATHS, ENSEMBLE_CONFIG_PATH
+    global USE_COLAB
+
     try:
         from google.colab import drive
         drive.mount("/content/drive")
         USE_COLAB = True
-        os.makedirs(COLAB_CHECKPOINT_DIR, exist_ok=True)
-        print(f"Colab detected. Checkpoints will save to: {COLAB_CHECKPOINT_DIR}")
+        print("Google Drive mounted.")
     except ImportError:
         print("Not running in Colab. Using local paths.")
+        return
+
+    # Clone repo if not already present
+    import subprocess
+    if not os.path.exists(COLAB_PROJECT_DIR):
+        subprocess.run(
+            ["git", "clone", "https://github.com/muhammadrakib2299/PneumoScan.git", COLAB_PROJECT_DIR],
+            check=True,
+        )
+        print(f"Repo cloned to: {COLAB_PROJECT_DIR}")
+    else:
+        subprocess.run(["git", "-C", COLAB_PROJECT_DIR, "pull"], check=True)
+        print(f"Repo updated at: {COLAB_PROJECT_DIR}")
+
+    # Add src to Python path
+    import sys
+    src_path = os.path.join(COLAB_PROJECT_DIR, "src")
+    if src_path not in sys.path:
+        sys.path.insert(0, src_path)
+
+    # Reconfigure paths — dataset from Drive, project from cloned repo
+    BASE_DIR = COLAB_PROJECT_DIR
+    RAW_DATA_DIR = COLAB_DATA_DIR
+    TRAIN_DIR = os.path.join(RAW_DATA_DIR, "train")
+    VAL_DIR = os.path.join(RAW_DATA_DIR, "val")
+    TEST_DIR = os.path.join(RAW_DATA_DIR, "test")
+    DATA_DIR = os.path.join(BASE_DIR, "data")
+    SAMPLE_DIR = os.path.join(DATA_DIR, "sample")
+
+    # Models save to Drive (persist across sessions)
+    MODELS_DIR = COLAB_CHECKPOINT_DIR
+    MODEL_SAVE_PATHS.update({
+        name: os.path.join(MODELS_DIR, f"{name}.keras")
+        for name in MODEL_NAMES
+    })
+    ENSEMBLE_CONFIG_PATH = os.path.join(MODELS_DIR, "ensemble_config.json")
+
+    # Outputs stay in Colab project dir (regenerable)
+    OUTPUTS_DIR = os.path.join(BASE_DIR, "outputs")
+    FIGURES_DIR = os.path.join(OUTPUTS_DIR, "figures")
+    REPORTS_DIR = os.path.join(OUTPUTS_DIR, "reports")
+    TFLITE_DIR = os.path.join(OUTPUTS_DIR, "tflite")
+    EDA_FIGURES_DIR = os.path.join(FIGURES_DIR, "eda")
+    TRAINING_CURVES_DIR = os.path.join(FIGURES_DIR, "training_curves")
+    CONFUSION_MATRICES_DIR = os.path.join(FIGURES_DIR, "confusion_matrices")
+    ROC_CURVES_DIR = os.path.join(FIGURES_DIR, "roc_curves")
+    PR_CURVES_DIR = os.path.join(FIGURES_DIR, "pr_curves")
+    GRADCAM_DIR = os.path.join(FIGURES_DIR, "gradcam")
+    LIME_DIR = os.path.join(FIGURES_DIR, "lime")
+    COMPARISON_DIR = os.path.join(FIGURES_DIR, "comparison")
+
+    # Create checkpoint dir on Drive
+    os.makedirs(COLAB_CHECKPOINT_DIR, exist_ok=True)
+
+    print(f"Dataset path: {RAW_DATA_DIR}")
+    print(f"Models save to: {MODELS_DIR}")
+    print(f"Project dir: {BASE_DIR}")
+    print("Setup complete!")
 
 
 def ensure_dirs():
