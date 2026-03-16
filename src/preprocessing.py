@@ -70,6 +70,11 @@ def reorganize_dataset(source_dir=None):
                 if not os.path.exists(dst_path):
                     shutil.copy2(src_path, dst_path)
 
+        # Remove original PNEUMONIA folder so only 3 class dirs remain
+        if os.path.exists(pneumonia_dir):
+            shutil.rmtree(pneumonia_dir)
+            print(f"  Removed original PNEUMONIA/ folder from {split}")
+
         stats[split] = counts
         total = sum(counts.values())
         print(f"\n{split.upper()} split:")
