@@ -2,9 +2,9 @@
 
 ## Project Title
 
-**Transfer Learning for Pneumonia Detection: From Agricultural Vision to Medical Imaging**
+**PneumoScan: Multi-Class Pneumonia Detection from Chest X-Rays Using Transfer Learning and Explainable AI**
 
-A multi-class chest X-ray classification system that detects Normal, Bacterial Pneumonia, and Viral Pneumonia using transfer learning — proving that computer vision pipelines developed for agricultural tasks (dragon fruit classification) can transfer effectively to life-saving medical imaging applications.
+A deep learning system that classifies chest X-rays into Normal, Bacterial Pneumonia, and Viral Pneumonia using transfer learning — with explainable AI (Grad-CAM + LIME) to help clinicians understand and trust AI-assisted diagnoses.
 
 ---
 
@@ -171,12 +171,6 @@ Generate a single comparison table:
 | MobileNetV2    | ...      | ...        | ...     | 3.4M    | ...            |
 | Ensemble       | ...      | ...        | ...     | —       | ...            |
 ```
-
-### 5.4 Thesis Comparison
-
-Side-by-side table comparing:
-- Dragon fruit classification (thesis) vs Chest X-ray classification (this project)
-- Same methodology, different domain — proves transferability claim
 
 ---
 
@@ -359,8 +353,7 @@ pneumoscan/
 │   │   └── comparison/                # Cross-model comparison charts
 │   ├── reports/
 │   │   ├── model_comparison.csv       # Final metrics table
-│   │   ├── classification_reports/    # Per-model sklearn reports
-│   │   └── thesis_comparison.csv      # Dragon fruit vs X-ray comparison
+│   │   └── classification_reports/    # Per-model sklearn reports
 │   └── tflite/
 │       ├── best_model.tflite
 │       └── best_model_quantized.tflite
@@ -398,7 +391,6 @@ The project is considered successful when:
 2. **Ensemble outperforms any single model** (even marginally)
 3. **Grad-CAM heatmaps** visually align with known pneumonia patterns (lower lobes, bilateral infiltrates)
 4. **LIME explanations** are consistent with Grad-CAM findings
-5. **Thesis comparison table** shows comparable methodology with strong medical results
-6. **Gradio demo** is functional and deployable
-7. **TFLite model** runs inference successfully with <5% accuracy drop
-8. **All results are reproducible** — random seeds set, code is clean and documented
+5. **Gradio demo** is functional and deployable
+6. **TFLite model** runs inference successfully with <5% accuracy drop
+7. **All results are reproducible** — random seeds set, code is clean and documented

@@ -113,7 +113,6 @@
   - [ ] Plot ROC curves for all models on same figure
   - [ ] Plot PR curves for all models on same figure
   - [ ] Multi-threshold analysis for best model
-  - [ ] Thesis comparison: dragon fruit pipeline vs chest X-ray pipeline
   - [ ] Save comparison CSV to outputs/reports/
   - [ ] Save all figures to outputs/figures/comparison/
 

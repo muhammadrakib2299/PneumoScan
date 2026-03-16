@@ -1,10 +1,10 @@
 # PneumoScan
 
-**Transfer Learning for Pneumonia Detection: From Agricultural Vision to Medical Imaging**
+**Multi-Class Pneumonia Detection from Chest X-Rays Using Transfer Learning and Explainable AI**
 
 A deep learning pipeline that classifies chest X-rays into **Normal**, **Bacterial Pneumonia**, and **Viral Pneumonia** using transfer learning — with explainable AI (Grad-CAM + LIME) and a deployable web demo.
 
-> This project proves that computer vision pipelines developed for agricultural tasks can transfer effectively to life-saving medical imaging applications.
+> AI-assisted pneumonia screening that helps clinicians make faster, more accurate diagnoses — especially in low-resource settings where radiologists are scarce.
 
 ---
 
@@ -212,17 +212,6 @@ Local Interpretable Model-agnostic Explanations identify which superpixel region
 | **Gradio Web App** | Browser-based demo, Hugging Face Spaces | Full model |
 | **TFLite (float32)** | Mobile/edge deployment | ~8MB |
 | **TFLite (int8 quantized)** | Ultra-lightweight deployment | ~3MB |
-
----
-
-## Thesis Connection
-
-This project is a direct extension of prior research on dragon fruit disease classification using CNNs. The same transfer learning methodology is applied here to medical imaging, demonstrating that:
-
-1. **The pipeline is domain-agnostic** — works for agriculture and healthcare
-2. **Transfer learning from ImageNet generalizes** across visual domains
-3. **Explainability tools** (Grad-CAM) provide meaningful outputs for both domains
-4. **The approach scales** from 4-class plant disease to 3-class medical diagnosis
 
 ---
 
