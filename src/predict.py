@@ -14,10 +14,8 @@ import cv2
 import tensorflow as tf
 from tensorflow import keras
 import matplotlib.pyplot as plt
-from config import (
-    CLASS_NAMES, IMG_SIZE, MODEL_SAVE_PATHS, MODELS_DIR,
-    ENSEMBLE_CONFIG_PATH, GRADCAM_DIR,
-)
+import config
+from config import CLASS_NAMES, IMG_SIZE
 from gradcam import generate_gradcam, overlay_heatmap
 from utils import save_figure
 
@@ -139,15 +137,15 @@ def predict_with_explanation(model, image_path, model_name="model", save_dir=Non
 
 def get_best_model_path():
     """Get the path to the best performing model (from ensemble config or default)."""
-    if os.path.exists(ENSEMBLE_CONFIG_PATH):
+    if os.path.exists(config.ENSEMBLE_CONFIG_PATH):
         import json
-        with open(ENSEMBLE_CONFIG_PATH) as f:
+        with open(config.ENSEMBLE_CONFIG_PATH) as f:
             config = json.load(f)
         best_name = config["models"][0]
-        return MODEL_SAVE_PATHS.get(best_name), best_name
+        return config.MODEL_SAVE_PATHS.get(best_name), best_name
 
     # Fallback: return first available model
-    for name, path in MODEL_SAVE_PATHS.items():
+    for name, path in config.MODEL_SAVE_PATHS.items():
         if os.path.exists(path):
             return path, name
 
@@ -169,7 +167,7 @@ if __name__ == "__main__":
             exit(1)
     else:
         model_name = args.model
-        model_path = MODEL_SAVE_PATHS.get(model_name)
+        model_path = config.MODEL_SAVE_PATHS.get(model_name)
 
     if not model_path or not os.path.exists(model_path):
         print(f"Error: Model not found at {model_path}")

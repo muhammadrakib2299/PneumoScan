@@ -6,7 +6,8 @@ to 3-class (Normal/Bacteria/Virus) based on filename prefixes.
 
 import os
 import shutil
-from config import RAW_DATA_DIR, CLASS_NAMES
+import config
+from config import CLASS_NAMES
 
 
 def reorganize_dataset(source_dir=None):
@@ -21,7 +22,7 @@ def reorganize_dataset(source_dir=None):
         person1_virus_1.jpeg   → VIRUS
     """
     if source_dir is None:
-        source_dir = RAW_DATA_DIR
+        source_dir = config.RAW_DATA_DIR
 
     splits = ["train", "val", "test"]
     stats = {}
@@ -92,7 +93,7 @@ def merge_val_into_train(source_dir=None):
     We'll use stratified K-Fold CV instead.
     """
     if source_dir is None:
-        source_dir = RAW_DATA_DIR
+        source_dir = config.RAW_DATA_DIR
 
     val_dir = os.path.join(source_dir, "val")
     train_dir = os.path.join(source_dir, "train")
@@ -125,7 +126,7 @@ def merge_val_into_train(source_dir=None):
 def get_dataset_stats(source_dir=None):
     """Get image counts per class per split."""
     if source_dir is None:
-        source_dir = RAW_DATA_DIR
+        source_dir = config.RAW_DATA_DIR
 
     stats = {}
     for split in ["train", "val", "test"]:

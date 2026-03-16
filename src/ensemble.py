@@ -8,20 +8,18 @@ import json
 import numpy as np
 import tensorflow as tf
 from tensorflow import keras
-from config import (
-    MODEL_NAMES, MODEL_SAVE_PATHS, ENSEMBLE_CONFIG_PATH,
-    MODELS_DIR, CLASS_NAMES,
-)
+import config
+from config import CLASS_NAMES
 
 
 def load_models(model_names=None):
     """Load all saved models."""
     if model_names is None:
-        model_names = MODEL_NAMES
+        model_names = config.MODEL_NAMES
 
     models = {}
     for name in model_names:
-        path = MODEL_SAVE_PATHS.get(name)
+        path = config.MODEL_SAVE_PATHS.get(name)
         if path and os.path.exists(path):
             print(f"Loading: {name} from {path}")
             models[name] = keras.models.load_model(path)
@@ -153,10 +151,10 @@ def build_ensemble(models_dict, val_ds, top_k=3):
         "ranking": {name: float(score) for name, score in rankings},
     }
 
-    os.makedirs(os.path.dirname(ENSEMBLE_CONFIG_PATH), exist_ok=True)
-    with open(ENSEMBLE_CONFIG_PATH, "w") as f:
+    os.makedirs(os.path.dirname(config.ENSEMBLE_CONFIG_PATH), exist_ok=True)
+    with open(config.ENSEMBLE_CONFIG_PATH, "w") as f:
         json.dump(config, f, indent=2)
-    print(f"Ensemble config saved to: {ENSEMBLE_CONFIG_PATH}")
+    print(f"Ensemble config saved to: {config.ENSEMBLE_CONFIG_PATH}")
 
     return top_models, weights, config
 

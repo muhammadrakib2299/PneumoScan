@@ -8,9 +8,9 @@ import numpy as np
 import tensorflow as tf
 from sklearn.utils.class_weight import compute_class_weight
 from sklearn.model_selection import StratifiedKFold
+import config
 from config import (
     IMG_SIZE, BATCH_SIZE, SEED, CLASS_NAMES, NUM_CLASSES,
-    TRAIN_DIR, TEST_DIR,
     ROTATION_RANGE, ZOOM_RANGE, BRIGHTNESS_RANGE,
     TRANSLATION_RANGE, HORIZONTAL_FLIP,
 )
@@ -70,14 +70,14 @@ def load_dataset_from_directory(directory, shuffle=True, augment=False):
 def load_train_dataset(train_dir=None, augment=True):
     """Load training dataset with augmentation."""
     if train_dir is None:
-        train_dir = TRAIN_DIR
+        train_dir = config.TRAIN_DIR
     return load_dataset_from_directory(train_dir, shuffle=True, augment=augment)
 
 
 def load_test_dataset(test_dir=None):
     """Load test dataset without augmentation."""
     if test_dir is None:
-        test_dir = TEST_DIR
+        test_dir = config.TEST_DIR
     return load_dataset_from_directory(test_dir, shuffle=False, augment=False)
 
 
@@ -89,7 +89,7 @@ def load_train_val_split(train_dir=None, val_split=0.2, augment=True):
         train_dataset, val_dataset
     """
     if train_dir is None:
-        train_dir = TRAIN_DIR
+        train_dir = config.TRAIN_DIR
 
     train_ds = tf.keras.utils.image_dataset_from_directory(
         train_dir,
@@ -147,7 +147,7 @@ def compute_class_weights(train_dir=None):
         dict mapping class index to weight
     """
     if train_dir is None:
-        train_dir = TRAIN_DIR
+        train_dir = config.TRAIN_DIR
 
     class_counts = []
     for i, class_name in enumerate(CLASS_NAMES):
@@ -193,7 +193,7 @@ def get_kfold_splits(train_dir=None, n_splits=5):
         List of (train_indices, val_indices) tuples
     """
     if train_dir is None:
-        train_dir = TRAIN_DIR
+        train_dir = config.TRAIN_DIR
 
     filepaths, labels = get_labels_from_directory(train_dir)
     skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=SEED)

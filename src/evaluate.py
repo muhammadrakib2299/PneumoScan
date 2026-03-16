@@ -13,11 +13,8 @@ from sklearn.metrics import (
     accuracy_score, f1_score, cohen_kappa_score,
     classification_report, roc_auc_score, average_precision_score,
 )
-from config import (
-    CLASS_NAMES, NUM_CLASSES, MODEL_NAMES, MODEL_SAVE_PATHS,
-    CONFUSION_MATRICES_DIR, ROC_CURVES_DIR, PR_CURVES_DIR,
-    COMPARISON_DIR, REPORTS_DIR, CONFIDENCE_THRESHOLDS,
-)
+import config
+from config import CLASS_NAMES, NUM_CLASSES, CONFIDENCE_THRESHOLDS
 from utils import (
     plot_confusion_matrix, plot_confusion_matrix_normalized,
     plot_roc_curves, plot_precision_recall_curves,
@@ -105,7 +102,7 @@ def evaluate_model(model, test_ds, model_name):
     report = print_classification_report(y_true, y_pred, model_name)
 
     # Save classification report
-    report_path = os.path.join(REPORTS_DIR, "classification_reports", f"{model_name}_report.txt")
+    report_path = os.path.join(config.REPORTS_DIR, "classification_reports", f"{model_name}_report.txt")
     os.makedirs(os.path.dirname(report_path), exist_ok=True)
     with open(report_path, "w") as f:
         f.write(report)
@@ -113,23 +110,23 @@ def evaluate_model(model, test_ds, model_name):
     # Plot confusion matrices
     plot_confusion_matrix(
         y_true, y_pred, model_name,
-        save_path=os.path.join(CONFUSION_MATRICES_DIR, f"{model_name}_cm.png"),
+        save_path=os.path.join(config.CONFUSION_MATRICES_DIR, f"{model_name}_cm.png"),
     )
     plot_confusion_matrix_normalized(
         y_true, y_pred, model_name,
-        save_path=os.path.join(CONFUSION_MATRICES_DIR, f"{model_name}_cm_normalized.png"),
+        save_path=os.path.join(config.CONFUSION_MATRICES_DIR, f"{model_name}_cm_normalized.png"),
     )
 
     # Plot ROC curves
     _, auc_scores = plot_roc_curves(
         y_true_onehot, y_pred_proba, model_name,
-        save_path=os.path.join(ROC_CURVES_DIR, f"{model_name}_roc.png"),
+        save_path=os.path.join(config.ROC_CURVES_DIR, f"{model_name}_roc.png"),
     )
 
     # Plot PR curves
     _, ap_scores = plot_precision_recall_curves(
         y_true_onehot, y_pred_proba, model_name,
-        save_path=os.path.join(PR_CURVES_DIR, f"{model_name}_pr.png"),
+        save_path=os.path.join(config.PR_CURVES_DIR, f"{model_name}_pr.png"),
     )
 
     metrics = {
@@ -156,7 +153,6 @@ def multi_threshold_analysis(model, test_ds, model_name, save_path=None):
 
     results = []
     for threshold in CONFIDENCE_THRESHOLDS:
-        # Apply threshold — predict class only if max prob >= threshold
         max_probs = np.max(y_pred_proba, axis=1)
         confident_mask = max_probs >= threshold
         y_pred_thresh = np.argmax(y_pred_proba[confident_mask], axis=1)
@@ -178,7 +174,6 @@ def multi_threshold_analysis(model, test_ds, model_name, save_path=None):
 
     df = pd.DataFrame(results)
 
-    # Plot
     fig, ax1 = plt.subplots(figsize=(10, 6))
     ax2 = ax1.twinx()
 
@@ -198,7 +193,6 @@ def multi_threshold_analysis(model, test_ds, model_name, save_path=None):
     plt.tight_layout()
 
     if save_path:
-        from utils import save_figure
         save_figure(fig, save_path)
     else:
         plt.show()
@@ -209,12 +203,12 @@ def multi_threshold_analysis(model, test_ds, model_name, save_path=None):
 def evaluate_all_models(test_ds, model_names=None):
     """Evaluate all saved models and generate comparison."""
     if model_names is None:
-        model_names = MODEL_NAMES
+        model_names = config.MODEL_NAMES
 
     all_metrics = {}
 
     for name in model_names:
-        model_path = MODEL_SAVE_PATHS.get(name)
+        model_path = config.MODEL_SAVE_PATHS.get(name)
         if model_path and os.path.exists(model_path):
             print(f"\nLoading: {model_path}")
             model = keras.models.load_model(model_path)
@@ -238,7 +232,7 @@ def evaluate_all_models(test_ds, model_names=None):
             for m in all_metrics.values()
         ])
 
-        csv_path = os.path.join(REPORTS_DIR, "model_comparison.csv")
+        csv_path = os.path.join(config.REPORTS_DIR, "model_comparison.csv")
         comparison_df.to_csv(csv_path, index=False)
         print(f"\nComparison table saved to: {csv_path}")
         print(comparison_df.to_string(index=False))
@@ -251,7 +245,7 @@ def evaluate_all_models(test_ds, model_names=None):
         for metric in ["accuracy", "f1_macro", "auc_roc"]:
             plot_model_comparison(
                 results_for_plot, metric=metric,
-                save_path=os.path.join(COMPARISON_DIR, f"comparison_{metric}.png"),
+                save_path=os.path.join(config.COMPARISON_DIR, f"comparison_{metric}.png"),
             )
 
     return all_metrics
@@ -270,6 +264,6 @@ if __name__ == "__main__":
     if args.model == "all":
         evaluate_all_models(test_ds)
     else:
-        model_path = MODEL_SAVE_PATHS.get(args.model)
+        model_path = config.MODEL_SAVE_PATHS.get(args.model)
         model = keras.models.load_model(model_path)
         evaluate_model(model, test_ds, args.model)

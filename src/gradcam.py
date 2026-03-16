@@ -9,7 +9,8 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import cv2
-from config import CLASS_NAMES, IMG_SIZE, GRADCAM_DIR
+import config
+from config import CLASS_NAMES, IMG_SIZE
 from utils import save_figure
 
 
@@ -164,7 +165,7 @@ def plot_gradcam_grid(image, gradcam_results, model_name, save_path=None):
 def generate_gradcam_for_samples(model, dataset, model_name, n_per_class=5, save_dir=None):
     """Generate Grad-CAM visualizations for sample images from each class."""
     if save_dir is None:
-        save_dir = os.path.join(GRADCAM_DIR, model_name)
+        save_dir = os.path.join(config.GRADCAM_DIR, model_name)
     os.makedirs(save_dir, exist_ok=True)
 
     class_images = {i: [] for i in range(len(CLASS_NAMES))}

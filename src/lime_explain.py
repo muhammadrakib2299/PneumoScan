@@ -8,7 +8,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from lime import lime_image
 from skimage.segmentation import mark_boundaries
-from config import CLASS_NAMES, IMG_SIZE, LIME_DIR
+import config
+from config import CLASS_NAMES, IMG_SIZE
 from utils import save_figure
 
 
@@ -191,7 +192,7 @@ def plot_gradcam_vs_lime(image, gradcam_overlay, lime_explanation, class_index,
 def generate_lime_for_samples(model, dataset, model_name, n_per_class=3, save_dir=None):
     """Generate LIME explanations for sample images from each class."""
     if save_dir is None:
-        save_dir = os.path.join(LIME_DIR, model_name)
+        save_dir = os.path.join(config.LIME_DIR, model_name)
     os.makedirs(save_dir, exist_ok=True)
 
     explainer = create_lime_explainer()

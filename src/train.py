@@ -8,13 +8,13 @@ import json
 import numpy as np
 import tensorflow as tf
 from tensorflow import keras
+import config
 from config import (
     PHASE1_EPOCHS, PHASE1_LEARNING_RATE,
     PHASE2_EPOCHS, PHASE2_LEARNING_RATE,
     EARLY_STOPPING_PATIENCE, REDUCE_LR_PATIENCE,
     REDUCE_LR_FACTOR, REDUCE_LR_MIN,
-    UNFREEZE_PERCENT, MODELS_DIR, TRAINING_CURVES_DIR,
-    MODEL_SAVE_PATHS, USE_COLAB, COLAB_CHECKPOINT_DIR,
+    UNFREEZE_PERCENT,
 )
 from models import get_model, unfreeze_top_layers
 from utils import plot_training_history
@@ -23,10 +23,10 @@ from utils import plot_training_history
 def get_callbacks(model_name, phase="phase1"):
     """Build training callbacks."""
     # Checkpoint path
-    if USE_COLAB:
-        ckpt_dir = COLAB_CHECKPOINT_DIR
+    if config.USE_COLAB:
+        ckpt_dir = config.COLAB_CHECKPOINT_DIR
     else:
-        ckpt_dir = MODELS_DIR
+        ckpt_dir = config.MODELS_DIR
 
     os.makedirs(ckpt_dir, exist_ok=True)
     ckpt_path = os.path.join(ckpt_dir, f"{model_name}_{phase}_best.keras")
@@ -109,7 +109,7 @@ def train_model(
     )
 
     # Save phase 1 training curves
-    save_path = os.path.join(TRAINING_CURVES_DIR, f"{model_name}_phase1.png")
+    save_path = os.path.join(config.TRAINING_CURVES_DIR, f"{model_name}_phase1.png")
     plot_training_history(history1, f"{model_name} (Phase 1)", save_path=save_path)
 
     # ── Phase 2: Fine-tuning (skip for custom CNN) ──
@@ -127,11 +127,11 @@ def train_model(
             callbacks=get_callbacks(model_name, "phase2"),
         )
 
-        save_path = os.path.join(TRAINING_CURVES_DIR, f"{model_name}_phase2.png")
+        save_path = os.path.join(config.TRAINING_CURVES_DIR, f"{model_name}_phase2.png")
         plot_training_history(history2, f"{model_name} (Phase 2)", save_path=save_path)
 
     # ── Save final model ──
-    save_path = MODEL_SAVE_PATHS.get(model_name, os.path.join(MODELS_DIR, f"{model_name}.keras"))
+    save_path = config.MODEL_SAVE_PATHS.get(model_name, os.path.join(MODELS_DIR, f"{model_name}.keras"))
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
     model.save(save_path)
     print(f"\nModel saved to: {save_path}")
@@ -141,10 +141,8 @@ def train_model(
 
 def train_all_models(train_ds, val_ds, class_weights=None, model_names=None):
     """Train all models sequentially."""
-    from config import MODEL_NAMES
-
     if model_names is None:
-        model_names = MODEL_NAMES
+        model_names = config.MODEL_NAMES
 
     results = {}
     for name in model_names:
@@ -156,7 +154,6 @@ def train_all_models(train_ds, val_ds, class_weights=None, model_names=None):
 
 if __name__ == "__main__":
     from data_loader import load_train_val_split, compute_class_weights
-    from config import TRAIN_DIR
 
     train_ds, val_ds = load_train_val_split()
     class_weights = compute_class_weights()
